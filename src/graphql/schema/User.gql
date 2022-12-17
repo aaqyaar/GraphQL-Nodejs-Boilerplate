@@ -1,8 +1,8 @@
 type User {
-  _id: string
-  name: string
-  password: string
-  phone: string
+  _id: String
+  name: String
+  password: String
+  phone: String
 }
 
 query getUsers {
@@ -16,4 +16,8 @@ fragment UserFields on User {
   name
   password
   phone
+}
+
+type Query {
+  users: [User]
 }

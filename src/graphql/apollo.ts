@@ -6,20 +6,32 @@ import express from 'express';
 import http from 'http';
 import cors from 'cors';
 import { json } from 'body-parser';
-import typeDefs from './schema';
+import typeDefs from './schema/index';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import logger from 'morgan';
 
 interface MyContext {
   token?: String;
 }
 
+const schema = makeExecutableSchema({
+  typeDefs,
+  resolvers: {},
+});
+
 export const startApolloServer = async (PORT: number) => {
   const app = express();
   const httpServer = http.createServer(app);
+
   const server = new ApolloServer<MyContext>({
-    typeDefs,
+    schema,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   });
+
   await server.start();
+  if (process.env.NODE_ENV === 'development') {
+    app.use(logger('dev'));
+  }
   app.use(
     '/graphql',
     cors<cors.CorsRequest>(),
