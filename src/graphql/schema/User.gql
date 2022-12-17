@@ -3,6 +3,15 @@ type User {
   name: String
   password: String
   phone: String
+  email: String
+}
+
+fragment UserFields on User {
+  _id
+  name
+  password
+  phone
+  email
 }
 
 query getUsers {
@@ -11,13 +20,26 @@ query getUsers {
   }
 }
 
-fragment UserFields on User {
-  _id
-  name
-  password
-  phone
+mutation Register(
+  $name: String!
+  $email: String!
+  $password: String!
+  $phone: String!
+) {
+  register(name: $name, email: $email, password: $password, phone: $phone) {
+    ...UserFields
+  }
 }
 
 type Query {
-  users: [User]
+  users: [User!]!
+}
+
+type Mutation {
+  register(
+    name: String!
+    email: String!
+    password: String!
+    phone: String!
+  ): User
 }

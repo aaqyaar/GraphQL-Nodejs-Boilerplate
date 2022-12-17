@@ -6,7 +6,8 @@ import express from 'express';
 import http from 'http';
 import cors from 'cors';
 import { json } from 'body-parser';
-import typeDefs from './schema/index';
+import typeDefs from './schema';
+import resolvers from './resolvers';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import logger from 'morgan';
 
@@ -16,7 +17,7 @@ interface MyContext {
 
 const schema = makeExecutableSchema({
   typeDefs,
-  resolvers: {},
+  resolvers,
 });
 
 export const startApolloServer = async (PORT: number) => {
