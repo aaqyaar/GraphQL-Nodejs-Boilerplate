@@ -1,0 +1,19 @@
+type User {
+  _id: string
+  name: string
+  password: string
+  phone: string
+}
+
+query getUsers {
+  users {
+    ...UserFields
+  }
+}
+
+fragment UserFields on User {
+  _id
+  name
+  password
+  phone
+}

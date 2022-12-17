@@ -7,10 +7,11 @@
     "start": "",
     "dev": "nodemon",
     "check-format": "prettier --check .",
-    "check-lint": "eslint --ext .ts --ext .js . --fix",
+    "check-lint": "eslint --ext .ts --fix",
     "check-types": "tsc --pretty --noEmit",
     "format": "prettier --write .",
-    "test-all": "npm run check-format && npm run check-lint && npm run check-types"
+    "test-all": "npm run check-format && npm run check-lint && npm run check-types",
+    "generate": "graphql-codegen --config codegen.ts"
   },
   "repository": {
     "type": "git",
@@ -25,17 +26,26 @@
   "homepage": "https://github.com/aaqyaar/nodejs-graphql-template#readme",
   "dependencies": {
     "@apollo/server": "^4.3.0",
+    "@graphql-codegen/typescript-operations": "^2.5.10",
+    "@graphql-tools/load-files": "^6.6.1",
+    "@graphql-tools/merge": "^8.3.14",
     "aws-sdk": "^2.1277.0",
     "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
     "cryptojs": "^2.5.3",
+    "express": "^4.18.2",
     "graphql": "^16.6.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.8.0"
   },
   "devDependencies": {
-
+    "@graphql-codegen/cli": "2.16.1",
+    "@graphql-codegen/typescript": "2.8.5",
+    "@graphql-codegen/typescript-mongodb": "2.4.6",
+    "@graphql-codegen/typescript-resolvers": "2.7.10",
+    "@types/cors": "^2.8.13",
+    "body-parser": "^1.20.1",
     "eslint-config-prettier": "^8.5.0",
-  
     "husky": "^8.0.2",
     "nodemon": "^2.0.20",
     "prettier": "^2.8.1",
