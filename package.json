@@ -1,0 +1,43 @@
+{
+  "name": "js-graphql-template",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "",
+    "dev": "nodemon",
+    "check-format": "prettier --check .",
+    "check-lint": "eslint --ext .ts --ext .js . --fix",
+    "format": "prettier --write .",
+    "test-all": "npm run check-format && npm run check-lint && npm run check-types"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aaqyaar/nodejs-graphql-template.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aaqyaar/nodejs-graphql-template/issues"
+  },
+  "homepage": "https://github.com/aaqyaar/nodejs-graphql-template#readme",
+  "dependencies": {
+    "@apollo/server": "^4.3.0",
+    "aws-sdk": "^2.1277.0",
+    "bcryptjs": "^2.4.3",
+    "cryptojs": "^2.5.3",
+    "graphql": "^16.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.8.0"
+  },
+  "devDependencies": {
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-standard-with-typescript": "^24.0.0",
+    "husky": "^8.0.2",
+    "nodemon": "^2.0.20",
+    "prettier": "^2.8.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.4"
+  }
+}
