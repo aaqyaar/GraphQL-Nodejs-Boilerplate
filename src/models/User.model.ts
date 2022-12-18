@@ -7,9 +7,11 @@ interface IUser extends Document {
   email: string;
   password: string;
   phone: string;
+  isConfirmed: boolean;
   encryptPassword: (value: string) => string;
   isMatchPassword: (value: string, enteredPassword: string) => boolean;
   getResetPasswordToken: () => string;
+  getConfirmEmailToken: () => string;
 }
 
 const schema = new Schema(
@@ -18,6 +20,7 @@ const schema = new Schema(
     email: { type: String, required: true, unique: true },
     phone: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    isConfirmed: { type: Boolean, default: false },
   },
   {
     timestamps: true,
@@ -42,8 +45,20 @@ schema.methods.getResetPasswordToken = function (): string {
     .createHash('sha256')
     .update(resetToken)
     .digest('hex');
+  // expires 10 minutes
   this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
   return resetToken;
+};
+
+schema.methods.getConfirmEmailToken = function (): string {
+  const confirmEmailToken = crypto.randomBytes(20).toString('hex');
+  this.confirmEmailToken = crypto
+    .createHash('sha256')
+    .update(confirmEmailToken)
+    .digest('hex');
+  // expires 10 minutes
+  this.confirmEmailExpire = Date.now() + 10 * 60 * 1000;
+  return confirmEmailToken;
 };
 
 const User = model<IUser>('User', schema);

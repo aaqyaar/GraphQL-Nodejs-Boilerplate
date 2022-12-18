@@ -5,10 +5,17 @@ import {
   MutationResolvers as UserMutation,
   User as IUser,
 } from '../../__generated__/generated';
+import emailRepository from '../../documents/emailRepository';
 
 async function users(): Promise<IUser[]> {
   const users = await User.find();
   return users;
+}
+
+let code: number;
+
+function generateDigits() {
+  return Math.floor(Math.random() * 900000) + 100000;
 }
 
 async function register(
@@ -25,6 +32,9 @@ async function register(
   });
   const hashed_password = await user.encryptPassword(password);
   user.password = hashed_password;
+  // const confirmEmailToken = await user.getConfirmEmailToken();
+  code = generateDigits();
+  await emailRepository.sendConfirmEmail(code);
   const newUser = await user.save();
   return newUser;
 }
