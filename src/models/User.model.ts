@@ -8,6 +8,11 @@ interface IUser extends Document {
   password: string;
   phone: string;
   isConfirmed: boolean;
+  resetPasswordToken?: string;
+  resetPasswordExpire?: Date;
+  confirmEmailToken?: string;
+  confirmEmailExpire?: Date;
+  confirmationCode?: string;
   encryptPassword: (value: string) => string;
   isMatchPassword: (value: string, enteredPassword: string) => boolean;
   getResetPasswordToken: () => string;
@@ -21,6 +26,11 @@ const schema = new Schema(
     phone: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     isConfirmed: { type: Boolean, default: false },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
+    confirmEmailToken: String,
+    confirmEmailExpire: Date,
+    confirmationCode: String,
   },
   {
     timestamps: true,
