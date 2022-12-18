@@ -4,6 +4,7 @@ import {
   UserFieldsFragment,
   MutationResolvers as UserMutation,
   User as IUser,
+  MutationLoginArgs,
 } from '../../__generated__/generated';
 import emailRepository from '../../documents/emailRepository';
 
@@ -95,6 +96,25 @@ async function resendCode(_: any, { email }: { email: string }) {
   return user;
 }
 
+/**
+ * @description: Login user and generate token
+ * @param {type MutationLoginArgs} { email, password }
+ */
+async function login(_: any, { email, password }: MutationLoginArgs) {
+  const user = await User.findOne({
+    email,
+  }).exec();
+  if (!user) throw new Error('User not found');
+  if (!user.isConfirmed) throw new Error('User is not confirmed');
+  const isMatch = await user.comparePassword(password, user.password);
+  if (!isMatch) throw new Error('Invalid password');
+  const token = await user.generateToken(user._id);
+  return {
+    token,
+    user,
+  };
+}
+
 const Query = {
   users,
 };
@@ -103,6 +123,7 @@ const Mutation: UserMutation = {
   register,
   confirmCode,
   resendCode,
+  login,
 };
 
 export default {

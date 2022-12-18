@@ -1,6 +1,7 @@
 import { Schema, model, Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 
 interface IUser extends Document {
   name: string;
@@ -14,9 +15,10 @@ interface IUser extends Document {
   confirmEmailExpire?: Date;
   confirmationCode?: string;
   encryptPassword: (value: string) => string;
-  isMatchPassword: (value: string, enteredPassword: string) => boolean;
+  comparePassword: (value: string, enteredPassword: string) => boolean;
   getResetPasswordToken: () => string;
   getConfirmEmailToken: () => string;
+  generateToken: (_id: string) => string;
 }
 
 const schema = new Schema(
@@ -42,11 +44,11 @@ schema.methods.encryptPassword = async (password: string): Promise<string> => {
   return bcrypt.hash(password, salt);
 };
 
-schema.methods.isMatchPassword = async (
+schema.methods.comparePassword = async (
   password: string,
-  enteredPassword: string
+  hashed_password: string
 ): Promise<boolean> => {
-  return await bcrypt.compare(password, enteredPassword);
+  return await bcrypt.compareSync(password, hashed_password);
 };
 
 schema.methods.getResetPasswordToken = function (): string {
@@ -69,6 +71,12 @@ schema.methods.getConfirmEmailToken = function (): string {
   // expires 10 minutes
   this.confirmEmailExpire = Date.now() + 10 * 60 * 1000;
   return confirmEmailToken;
+};
+
+schema.methods.generateToken = function (_id: string): string {
+  return jwt.sign({ _id }, process.env.JWT_SECRET as string, {
+    expiresIn: process.env.JWT_EXPIRE,
+  });
 };
 
 const User = model<IUser>('User', schema);
