@@ -9,27 +9,32 @@ const cognitoIdentity = new AWS.CognitoIdentityServiceProvider({
   region: config.region,
 });
 
-export default class AuthService {
+export default class AWSAuth {
   private static ClientId = auth.clientId as string;
   private static Secret = auth.clientSecret as string;
-
+  /**
+   * hash secret
+   */
   private static hashSecret(email: string): string {
     return crypto
-      .createHmac('SHA256', this.Secret)
-      .update(email + this.ClientId)
+      .createHmac('SHA256', AWSAuth.Secret)
+      .update(email + AWSAuth.ClientId)
       .digest('base64');
   }
 
-  static async register(
+  /**
+   * register to aws cognito
+   */
+  async register(
     email: string,
     password: string,
     userAttr: Array<any>
   ): Promise<any> {
     const params = {
-      ClientId: this.ClientId,
+      ClientId: AWSAuth.ClientId,
       Username: email,
       Password: password,
-      SecretHash: this.hashSecret(email),
+      SecretHash: AWSAuth.hashSecret(email),
       UserAttributes: userAttr,
     };
     try {
@@ -41,13 +46,15 @@ export default class AuthService {
       return error;
     }
   }
-
-  static async confirm(email: string, code: string): Promise<any> {
+  /**
+   * confirm to aws cognito
+   */
+  async confirm(email: string, code: string): Promise<any> {
     const params = {
-      ClientId: this.ClientId,
+      ClientId: AWSAuth.ClientId,
       Username: email,
       ConfirmationCode: code,
-      SecretHash: this.hashSecret(email),
+      SecretHash: AWSAuth.hashSecret(email),
     };
     try {
       const res = await cognitoIdentity.confirmSignUp(params).promise();
@@ -56,15 +63,17 @@ export default class AuthService {
       return error;
     }
   }
-
-  static async login(email: string, password: string): Promise<any> {
+  /**
+   * login from aws cognito
+   */
+  async login(email: string, password: string): Promise<any> {
     const params = {
       AuthFlow: 'USER_PASSWORD_AUTH',
-      ClientId: this.ClientId,
+      ClientId: AWSAuth.ClientId,
       AuthParameters: {
         USERNAME: email,
         PASSWORD: password,
-        SECRET_HASH: this.hashSecret(email),
+        SECRET_HASH: AWSAuth.hashSecret(email),
       },
     };
     try {
@@ -76,12 +85,14 @@ export default class AuthService {
       return error;
     }
   }
-
-  static async resendCode(email: string): Promise<any> {
+  /**
+   *  resend code to aws cognito
+   */
+  async resendCode(email: string): Promise<any> {
     const params = {
-      ClientId: this.ClientId,
+      ClientId: AWSAuth.ClientId,
       Username: email,
-      SecretHash: this.hashSecret(email),
+      SecretHash: AWSAuth.hashSecret(email),
     };
     try {
       const res = await cognitoIdentity

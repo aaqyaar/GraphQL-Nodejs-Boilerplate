@@ -1,9 +1,15 @@
+scalar Void
+
 type User {
   _id: String
   name: String
   password: String
   phone: String
   email: String
+}
+type AuthData {
+  token: String!
+  user: User!
 }
 
 fragment UserFields on User {
@@ -31,6 +37,15 @@ mutation Register(
   }
 }
 
+mutation Login($email: String!, $password: String!) {
+  login(email: $email, password: $password) {
+    token
+    user {
+      ...UserFields
+    }
+  }
+}
+
 type Query {
   users: [User!]!
 }
@@ -42,4 +57,7 @@ type Mutation {
     password: String!
     phone: String!
   ): User
+  login(email: String!, password: String!): AuthData
+  confirmCode(email: String!, code: String!): Void
+  resendCode(email: String!): Void
 }
