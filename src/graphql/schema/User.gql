@@ -60,4 +60,6 @@ type Mutation {
   login(email: String!, password: String!): AuthData
   confirmCode(email: String!, code: String!): Void
   resendCode(email: String!): Void
+  resetPassword(email: String!): Void
+  forgotPassword(password: String!, resetToken: String!): Void
 }

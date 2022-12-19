@@ -5,6 +5,7 @@ import {
   MutationResolvers as UserMutation,
   User as IUser,
   MutationLoginArgs,
+  MutationForgotPasswordArgs,
 } from '../../__generated__/generated';
 import emailRepository from '../../documents/emailRepository';
 
@@ -115,6 +116,49 @@ async function login(_: any, { email, password }: MutationLoginArgs) {
   };
 }
 
+/**
+ * @description: Reset password and send reset password link to user email address
+ * @param {type string} email
+ * @return {*}
+ */
+async function resetPassword(_: any, { email }: { email: string }) {
+  const user = await User.findOne({
+    email,
+  }).exec();
+  if (!user) throw new Error('User not found');
+  if (!user.isConfirmed) throw new Error('User is not confirmed');
+  const resetToken = await user.getResetPasswordToken();
+  user.resetPasswordToken = resetToken;
+  user.resetPasswordExpire = (Date.now() + 10 * 60 * 1000) as any;
+  await user.save();
+  const uri = `${process.env.CLIENT_URL}/auth/reset-password/${resetToken}`;
+  await emailRepository.sendResetPasswordEmail(user.email, uri);
+  return user;
+}
+
+/**
+ * @description: Forgot password
+ * @param {type string} { email, resetToken }
+ * @return {*}
+ */
+async function forgotPassword(
+  _: any,
+  { password, resetToken }: MutationForgotPasswordArgs
+) {
+  const isFound = await User.findOne({
+    resetPasswordToken: resetToken,
+    resetPasswordExpire: { $gt: Date.now() },
+  }).exec();
+  if (!isFound) throw new Error('Token is invalid or expired');
+  const user = isFound;
+  const hashed_password = await user.encryptPassword(password);
+  user.password = hashed_password;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+  await user.save();
+  return user;
+}
+
 const Query = {
   users,
 };
@@ -124,6 +168,8 @@ const Mutation: UserMutation = {
   confirmCode,
   resendCode,
   login,
+  resetPassword,
+  forgotPassword,
 };
 
 export default {

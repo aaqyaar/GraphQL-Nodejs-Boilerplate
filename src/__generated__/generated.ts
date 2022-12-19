@@ -1,22 +1,10 @@
-import {
-  GraphQLResolveInfo,
-  GraphQLScalarType,
-  GraphQLScalarTypeConfig,
-} from 'graphql';
+import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends { [key: string]: unknown }> = {
-  [K in keyof T]: T[K];
-};
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
-  [SubKey in K]?: Maybe<T[SubKey]>;
-};
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
-  [SubKey in K]: Maybe<T[SubKey]>;
-};
-export type RequireFields<T, K extends keyof T> = Omit<T, K> & {
-  [P in K]-?: NonNullable<T[P]>;
-};
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -36,20 +24,31 @@ export type AuthData = {
 export type Mutation = {
   __typename?: 'Mutation';
   confirmCode?: Maybe<Scalars['Void']>;
+  forgotPassword?: Maybe<Scalars['Void']>;
   login?: Maybe<AuthData>;
   register?: Maybe<User>;
   resendCode?: Maybe<Scalars['Void']>;
+  resetPassword?: Maybe<Scalars['Void']>;
 };
+
 
 export type MutationConfirmCodeArgs = {
   code: Scalars['String'];
   email: Scalars['String'];
 };
 
+
+export type MutationForgotPasswordArgs = {
+  password: Scalars['String'];
+  resetToken: Scalars['String'];
+};
+
+
 export type MutationLoginArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
 };
+
 
 export type MutationRegisterArgs = {
   email: Scalars['String'];
@@ -58,7 +57,13 @@ export type MutationRegisterArgs = {
   phone: Scalars['String'];
 };
 
+
 export type MutationResendCodeArgs = {
+  email: Scalars['String'];
+};
+
+
+export type MutationResetPasswordArgs = {
   email: Scalars['String'];
 };
 
@@ -81,14 +86,15 @@ export type AdditionalEntityFields = {
   type?: InputMaybe<Scalars['String']>;
 };
 
+
+
 export type ResolverTypeWrapper<T> = Promise<T> | T;
+
 
 export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
   resolve: ResolverFn<TResult, TParent, TContext, TArgs>;
 };
-export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
-  | ResolverFn<TResult, TParent, TContext, TArgs>
-  | ResolverWithResolve<TResult, TParent, TContext, TArgs>;
+export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> = ResolverFn<TResult, TParent, TContext, TArgs> | ResolverWithResolve<TResult, TParent, TContext, TArgs>;
 
 export type ResolverFn<TResult, TParent, TContext, TArgs> = (
   parent: TParent,
@@ -111,25 +117,9 @@ export type SubscriptionResolveFn<TResult, TParent, TContext, TArgs> = (
   info: GraphQLResolveInfo
 ) => TResult | Promise<TResult>;
 
-export interface SubscriptionSubscriberObject<
-  TResult,
-  TKey extends string,
-  TParent,
-  TContext,
-  TArgs
-> {
-  subscribe: SubscriptionSubscribeFn<
-    { [key in TKey]: TResult },
-    TParent,
-    TContext,
-    TArgs
-  >;
-  resolve?: SubscriptionResolveFn<
-    TResult,
-    { [key in TKey]: TResult },
-    TContext,
-    TArgs
-  >;
+export interface SubscriptionSubscriberObject<TResult, TKey extends string, TParent, TContext, TArgs> {
+  subscribe: SubscriptionSubscribeFn<{ [key in TKey]: TResult }, TParent, TContext, TArgs>;
+  resolve?: SubscriptionResolveFn<TResult, { [key in TKey]: TResult }, TContext, TArgs>;
 }
 
 export interface SubscriptionResolverObject<TResult, TParent, TContext, TArgs> {
@@ -137,26 +127,12 @@ export interface SubscriptionResolverObject<TResult, TParent, TContext, TArgs> {
   resolve: SubscriptionResolveFn<TResult, any, TContext, TArgs>;
 }
 
-export type SubscriptionObject<
-  TResult,
-  TKey extends string,
-  TParent,
-  TContext,
-  TArgs
-> =
+export type SubscriptionObject<TResult, TKey extends string, TParent, TContext, TArgs> =
   | SubscriptionSubscriberObject<TResult, TKey, TParent, TContext, TArgs>
   | SubscriptionResolverObject<TResult, TParent, TContext, TArgs>;
 
-export type SubscriptionResolver<
-  TResult,
-  TKey extends string,
-  TParent = {},
-  TContext = {},
-  TArgs = {}
-> =
-  | ((
-      ...args: any[]
-    ) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
+export type SubscriptionResolver<TResult, TKey extends string, TParent = {}, TContext = {}, TArgs = {}> =
+  | ((...args: any[]) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
   | SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>;
 
 export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
@@ -165,20 +141,11 @@ export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
   info: GraphQLResolveInfo
 ) => Maybe<TTypes> | Promise<Maybe<TTypes>>;
 
-export type IsTypeOfResolverFn<T = {}, TContext = {}> = (
-  obj: T,
-  context: TContext,
-  info: GraphQLResolveInfo
-) => boolean | Promise<boolean>;
+export type IsTypeOfResolverFn<T = {}, TContext = {}> = (obj: T, context: TContext, info: GraphQLResolveInfo) => boolean | Promise<boolean>;
 
 export type NextResolverFn<T> = () => Promise<T>;
 
-export type DirectiveResolverFn<
-  TResult = {},
-  TParent = {},
-  TContext = {},
-  TArgs = {}
-> = (
+export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs = {}> = (
   next: NextResolverFn<TResult>,
   parent: TParent,
   args: TArgs,
@@ -215,138 +182,68 @@ export type UnionDirectiveArgs = {
   additionalFields?: Maybe<Array<Maybe<AdditionalEntityFields>>>;
 };
 
-export type UnionDirectiveResolver<
-  Result,
-  Parent,
-  ContextType = any,
-  Args = UnionDirectiveArgs
-> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+export type UnionDirectiveResolver<Result, Parent, ContextType = any, Args = UnionDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
 export type AbstractEntityDirectiveArgs = {
   discriminatorField: Scalars['String'];
   additionalFields?: Maybe<Array<Maybe<AdditionalEntityFields>>>;
 };
 
-export type AbstractEntityDirectiveResolver<
-  Result,
-  Parent,
-  ContextType = any,
-  Args = AbstractEntityDirectiveArgs
-> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+export type AbstractEntityDirectiveResolver<Result, Parent, ContextType = any, Args = AbstractEntityDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
 export type EntityDirectiveArgs = {
   embedded?: Maybe<Scalars['Boolean']>;
   additionalFields?: Maybe<Array<Maybe<AdditionalEntityFields>>>;
 };
 
-export type EntityDirectiveResolver<
-  Result,
-  Parent,
-  ContextType = any,
-  Args = EntityDirectiveArgs
-> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+export type EntityDirectiveResolver<Result, Parent, ContextType = any, Args = EntityDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
 export type ColumnDirectiveArgs = {
   overrideType?: Maybe<Scalars['String']>;
 };
 
-export type ColumnDirectiveResolver<
-  Result,
-  Parent,
-  ContextType = any,
-  Args = ColumnDirectiveArgs
-> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+export type ColumnDirectiveResolver<Result, Parent, ContextType = any, Args = ColumnDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
-export type IdDirectiveArgs = {};
+export type IdDirectiveArgs = { };
 
-export type IdDirectiveResolver<
-  Result,
-  Parent,
-  ContextType = any,
-  Args = IdDirectiveArgs
-> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+export type IdDirectiveResolver<Result, Parent, ContextType = any, Args = IdDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
 export type LinkDirectiveArgs = {
   overrideType?: Maybe<Scalars['String']>;
 };
 
-export type LinkDirectiveResolver<
-  Result,
-  Parent,
-  ContextType = any,
-  Args = LinkDirectiveArgs
-> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+export type LinkDirectiveResolver<Result, Parent, ContextType = any, Args = LinkDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
-export type EmbeddedDirectiveArgs = {};
+export type EmbeddedDirectiveArgs = { };
 
-export type EmbeddedDirectiveResolver<
-  Result,
-  Parent,
-  ContextType = any,
-  Args = EmbeddedDirectiveArgs
-> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+export type EmbeddedDirectiveResolver<Result, Parent, ContextType = any, Args = EmbeddedDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
 export type MapDirectiveArgs = {
   path: Scalars['String'];
 };
 
-export type MapDirectiveResolver<
-  Result,
-  Parent,
-  ContextType = any,
-  Args = MapDirectiveArgs
-> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+export type MapDirectiveResolver<Result, Parent, ContextType = any, Args = MapDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
-export type AuthDataResolvers<
-  ContextType = any,
-  ParentType extends ResolversParentTypes['AuthData'] = ResolversParentTypes['AuthData']
-> = {
+export type AuthDataResolvers<ContextType = any, ParentType extends ResolversParentTypes['AuthData'] = ResolversParentTypes['AuthData']> = {
   token?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MutationResolvers<
-  ContextType = any,
-  ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']
-> = {
-  confirmCode?: Resolver<
-    Maybe<ResolversTypes['Void']>,
-    ParentType,
-    ContextType,
-    RequireFields<MutationConfirmCodeArgs, 'code' | 'email'>
-  >;
-  login?: Resolver<
-    Maybe<ResolversTypes['AuthData']>,
-    ParentType,
-    ContextType,
-    RequireFields<MutationLoginArgs, 'email' | 'password'>
-  >;
-  register?: Resolver<
-    Maybe<ResolversTypes['User']>,
-    ParentType,
-    ContextType,
-    RequireFields<MutationRegisterArgs, 'email' | 'name' | 'password' | 'phone'>
-  >;
-  resendCode?: Resolver<
-    Maybe<ResolversTypes['Void']>,
-    ParentType,
-    ContextType,
-    RequireFields<MutationResendCodeArgs, 'email'>
-  >;
+export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  confirmCode?: Resolver<Maybe<ResolversTypes['Void']>, ParentType, ContextType, RequireFields<MutationConfirmCodeArgs, 'code' | 'email'>>;
+  forgotPassword?: Resolver<Maybe<ResolversTypes['Void']>, ParentType, ContextType, RequireFields<MutationForgotPasswordArgs, 'password' | 'resetToken'>>;
+  login?: Resolver<Maybe<ResolversTypes['AuthData']>, ParentType, ContextType, RequireFields<MutationLoginArgs, 'email' | 'password'>>;
+  register?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationRegisterArgs, 'email' | 'name' | 'password' | 'phone'>>;
+  resendCode?: Resolver<Maybe<ResolversTypes['Void']>, ParentType, ContextType, RequireFields<MutationResendCodeArgs, 'email'>>;
+  resetPassword?: Resolver<Maybe<ResolversTypes['Void']>, ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'email'>>;
 };
 
-export type QueryResolvers<
-  ContextType = any,
-  ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']
-> = {
+export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   users?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
 };
 
-export type UserResolvers<
-  ContextType = any,
-  ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']
-> = {
+export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
   _id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   email?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -355,8 +252,7 @@ export type UserResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export interface VoidScalarConfig
-  extends GraphQLScalarTypeConfig<ResolversTypes['Void'], any> {
+export interface VoidScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Void'], any> {
   name: 'Void';
 }
 
@@ -380,28 +276,12 @@ export type DirectiveResolvers<ContextType = any> = {
 };
 
 import { ObjectId } from 'mongodb';
-export type UserFieldsFragment = {
-  __typename?: 'User';
-  _id?: string | null;
-  name?: string | null;
-  password?: string | null;
-  phone?: string | null;
-  email?: string | null;
-};
+export type UserFieldsFragment = { __typename?: 'User', _id?: string | null, name?: string | null, password?: string | null, phone?: string | null, email?: string | null };
 
-export type GetUsersQueryVariables = Exact<{ [key: string]: never }>;
+export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
 
-export type GetUsersQuery = {
-  __typename?: 'Query';
-  users: Array<{
-    __typename?: 'User';
-    _id?: string | null;
-    name?: string | null;
-    password?: string | null;
-    phone?: string | null;
-    email?: string | null;
-  }>;
-};
+
+export type GetUsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', _id?: string | null, name?: string | null, password?: string | null, phone?: string | null, email?: string | null }> };
 
 export type RegisterMutationVariables = Exact<{
   name: Scalars['String'];
@@ -410,35 +290,13 @@ export type RegisterMutationVariables = Exact<{
   phone: Scalars['String'];
 }>;
 
-export type RegisterMutation = {
-  __typename?: 'Mutation';
-  register?: {
-    __typename?: 'User';
-    _id?: string | null;
-    name?: string | null;
-    password?: string | null;
-    phone?: string | null;
-    email?: string | null;
-  } | null;
-};
+
+export type RegisterMutation = { __typename?: 'Mutation', register?: { __typename?: 'User', _id?: string | null, name?: string | null, password?: string | null, phone?: string | null, email?: string | null } | null };
 
 export type LoginMutationVariables = Exact<{
   email: Scalars['String'];
   password: Scalars['String'];
 }>;
 
-export type LoginMutation = {
-  __typename?: 'Mutation';
-  login?: {
-    __typename?: 'AuthData';
-    token: string;
-    user: {
-      __typename?: 'User';
-      _id?: string | null;
-      name?: string | null;
-      password?: string | null;
-      phone?: string | null;
-      email?: string | null;
-    };
-  } | null;
-};
+
+export type LoginMutation = { __typename?: 'Mutation', login?: { __typename?: 'AuthData', token: string, user: { __typename?: 'User', _id?: string | null, name?: string | null, password?: string | null, phone?: string | null, email?: string | null } } | null };
