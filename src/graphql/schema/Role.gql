@@ -1,0 +1,128 @@
+type Role {
+  id: ID!
+  name: String!
+  description: String
+  permissions: [Permission!]!
+}
+
+type Permission {
+  id: ID!
+  name: String!
+  description: String
+}
+
+mutation {
+  createRole(name: "admin", description: "Admin role") {
+    id
+    name
+    description
+  }
+}
+
+mutation {
+  createPermission(name: "create", description: "Create permission") {
+    id
+    name
+    description
+  }
+}
+
+mutation {
+  addPermissionToRole(roleId: 1, permissionId: 1) {
+    id
+    name
+    description
+    permissions {
+      id
+      name
+      description
+    }
+  }
+}
+
+mutation {
+  removePermissionFromRole(roleId: 1, permissionId: 1) {
+    id
+    name
+    description
+    permissions {
+      id
+      name
+      description
+    }
+  }
+}
+
+mutation {
+  deleteRole(id: 1) {
+    id
+    name
+    description
+  }
+}
+
+mutation {
+  deletePermission(id: 1) {
+    id
+    name
+    description
+  }
+}
+
+query {
+  roles {
+    id
+    name
+    description
+    permissions {
+      id
+      name
+      description
+    }
+  }
+}
+
+query {
+  permissions {
+    id
+    name
+    description
+  }
+}
+
+query {
+  role(id: 1) {
+    id
+    name
+    description
+    permissions {
+      id
+      name
+      description
+    }
+  }
+}
+
+query {
+  permission(id: 1) {
+    id
+    name
+    description
+  }
+}
+
+type Query {
+  roles: [Role!]!
+  permissions: [Permission!]!
+  role(id: ID!): Role!
+  permission(id: ID!): Permission!
+}
+
+type Mutation {
+  createRole(name: String!, description: String): Role!
+  createPermission(name: String!, description: String): Permission!
+  addPermissionToRole(roleId: ID!, permissionId: ID!): Role!
+  removePermissionFromRole(roleId: ID!, permissionId: ID!): Role!
+  deleteRole(id: ID!): Role!
+  deletePermission(id: ID!): Permission!
+}

@@ -2,13 +2,15 @@
   "name": "js-graphql-template",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "build/src/server.js",
   "scripts": {
-    "build": "tsc",
-    "start": "",
+    "copy-gql-files": "cp src/graphql/schema/*.gql build/src/graphql/schema/",
+    "build": "tsc && npm run copy-gql-files",
+    "start": "node build/src/server.js",
     "dev": "nodemon",
     "check-format": "prettier --check .",
     "check-lint": "eslint --ext .ts --fix",
+  
     "check-types": "tsc --pretty --noEmit",
     "format": "prettier --write .",
     "test-all": "npm run check-format && npm run check-lint && npm run check-types",
